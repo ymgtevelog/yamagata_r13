@@ -1,6 +1,6 @@
 # 山形ドライブ R13（Yamagata Drive R13）
 
-国道13号を米沢から金山まで、沿線 13 市町村をめぐる Android 向け 3D ドライブゲームです。
+国道13号を米沢から金山まで、沿線13市町村をめぐる3Dドライブゲームです。
 無料・広告なし・アプリ内購入なし。Android アプリのほか、iPhone・Android のブラウザでも遊べます。
 
 - ブラウザで遊ぶ：https://ymgtevelog.github.io/yamagata_r13/play/
