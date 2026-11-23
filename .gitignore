@@ -1,0 +1,15 @@
+# 署名鍵とパスワード（絶対に公開しない）
+*.jks
+*.keystore
+*.p12
+keystore/
+upload.properties
+*.properties
+# ビルドの生成物
+build/
+dist/
+*.apk
+*.aab
+*.apks
+.DS_Store
+Thumbs.db
