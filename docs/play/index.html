@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>山形ドライブ R13</title>
+<link rel="stylesheet" href="css/style.css">
+<meta name="theme-color" content="#1f3b57">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="山形ドライブ">
+<meta name="description" content="国道13号を米沢から金山まで、沿線13市町村をめぐる3Dドライブゲーム（非公式・広告なし）">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+</head>
+<body>
+<canvas id="gl"></canvas>
+<div id="vignette" aria-hidden="true"></div>
+<div id="rotate-hint" aria-live="polite"><div><div class="rh-icon">📱↻</div><b>端末を横向きにしてください</b><small>このゲームは横向きで遊びます</small></div></div>
+<div id="confetti" aria-hidden="true"></div>
+
+<!-- ================= TITLE ================= -->
+<section id="scr-title" class="screen">
+  <div class="title-wrap">
+    <div class="logo">
+      <div class="logo-shield"><small>国道</small>13</div>
+      <div class="logo-text">
+        <h1>山形ドライブ <span>R13</span></h1>
+        <p class="logo-sub">米沢から金山へ　13のまちをめぐる53 kmの旅</p>
+      </div>
+    </div>
+    <div class="best-row"><div class="best">BEST SCORE <b id="title-best">0</b></div>
+      <div class="season-pick" id="season-pick" aria-label="季節"></div></div>
+    <button class="title-trip" id="title-trip" style="display:none"></button>
+    <div class="title-buttons">
+      <button class="btn big primary" data-go="full">🚗 全行程で出発<small>米沢 → 金山　53 km</small></button>
+      <div class="row two">
+        <button class="btn big" data-nav="courses">⏱ 区間チャレンジ<small>4～10 kmの短時間コース</small></button>
+        <button class="btn big tut" id="btn-tutorial">🔰 練習ドライブ<small>操作とルールを約5分で</small></button>
+      </div>
+      <div class="row">
+        <button class="btn" data-nav="garage">🔧 ガレージ</button>
+        <button class="btn" data-nav="zukan">📖 山形図鑑</button>
+        <button class="btn" data-nav="records">🏆 記録</button>
+        <button class="btn" data-nav="settings">⚙ 設定</button>
+        <button class="btn" data-nav="howto">❔ 遊び方</button>
+        <button class="btn" data-nav="music">♪ 楽曲紹介</button>
+      </div>
+    </div>
+  </div>
+  <div class="version" id="ver-line">山形ドライブ R13 ver 1.0.0　非公式・個人制作<br>オフライン・通信／広告／課金なし</div>
+  <div class="a2hs" id="a2hs"><b>📲 ホーム画面に追加すると全画面で遊べます</b><span>Safari の共有ボタン <i>⎙</i> →「ホーム画面に追加」</span><button type="button" id="a2hs-close" aria-label="閉じる">×</button></div>
+</section>
+
+<!-- ================= COURSES ================= -->
+<section id="scr-courses" class="screen panel-screen">
+  <header><button class="back" data-nav="title">‹ 戻る</button><h2>区間チャレンジ</h2></header>
+  <div id="course-list" class="card-grid"></div>
+</section>
+
+<!-- ================= DRIVER ================= -->
+<section id="scr-driver" class="screen panel-screen">
+  <header><button class="back" data-nav="back-driver">‹ 戻る</button><h2>ドライバー選択　<small id="driver-course"></small></h2></header>
+  <div class="driver-body">
+    <div class="driver-left">
+      <div id="driver-list" class="chips"></div>
+      <div class="newname">
+        <input id="name-input" maxlength="20" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="NEW NAME (A～Z)">
+        <button class="btn primary" id="name-add">登録</button>
+      </div>
+      <p class="hint" id="name-hint">名前はアルファベットA～Zの1～16文字（最大20名）。大文字に統一して保存します。</p>
+    </div>
+    <div class="driver-right" id="driver-detail"><p class="hint">名前を選ぶか、新しく登録してください。</p></div>
+  </div>
+</section>
+
+<!-- ================= GARAGE ================= -->
+<section id="scr-garage" class="screen panel-screen see-through">
+  <header><button class="back" data-nav="title">‹ 戻る</button><h2>ガレージ</h2><select id="garage-driver"></select></header>
+  <div class="garage-body">
+    <div class="garage-panel">
+      <div id="garage-points" class="points"></div>
+      <h3>車種</h3><div id="garage-cars" class="car-list"></div>
+      <h3>車体色</h3><div id="garage-colors" class="swatches"></div>
+      <p class="hint">選択は次の新しい旅に適用されます。保存中の旅は開始時の車種と色で再開します。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ZUKAN ================= -->
+<section id="scr-zukan" class="screen panel-screen">
+  <header><button class="back" data-nav="title">‹ 戻る</button><h2>山形図鑑 <small id="zukan-count"></small></h2></header>
+  <div class="zukan-body">
+    <h3>まちのスタンプ</h3><div id="zukan-stamps" class="stamps"></div>
+    <h3>道の駅のおみやげ</h3><div id="zukan-items" class="items"></div>
+    <h3>道の駅 ご当地クイズ</h3><div id="zukan-quiz" class="quizprog"></div>
+    <h3>名所カード <small id="zukan-cards-n"></small></h3><p class="hint">走行中に出会った名所のカードです。カードを押すと紹介文を読めます。</p><div id="zukan-cards" class="cardgrid"></div>
+    <p class="hint">図鑑は端末共通です。別ドライバー・別コースの獲得状況を合算します。</p>
+  </div>
+</section>
+
+<!-- ================= RECORDS ================= -->
+<section id="scr-records" class="screen panel-screen">
+  <header><button class="back" data-nav="title">‹ 戻る</button><h2>記録</h2></header>
+  <div id="rec-tabs" class="tabs"></div>
+  <div id="rec-body" class="rec-body"></div>
+</section>
+
+<!-- ================= SETTINGS ================= -->
+<section id="scr-settings" class="screen panel-screen">
+  <header><button class="back" data-nav="back-settings">‹ 戻る</button><h2>設定</h2></header>
+  <div class="settings-body" id="settings-body"></div>
+</section>
+
+<!-- ================= MUSIC ================= -->
+<section id="scr-music" class="screen panel-screen">
+  <header><button class="back" data-nav="back-music">‹ 戻る</button><h2>♪ 楽曲紹介</h2></header>
+  <div class="music-body">
+    <div class="music-hero">
+      <div class="mh-tx">
+        <div class="mh-tag">走行中の BGM</div>
+        <h3>山形たびめぐり音楽帳</h3>
+        <p>山形のまちの魅力を、POP なオリジナルソングでめぐるシリーズです。走行中は、いま走っている市町村の歌が流れ、新しいまちに入ると次の歌へ切り替わります。</p>
+        <div class="mh-btns">
+          <button class="btn yt" id="mu-playlist">▶ 再生リストを YouTube で見る</button>
+          <button class="btn" id="mu-channel">制作・発信：山形イベログ <small>@ymgt_evelog</small></button>
+        </div>
+      </div>
+    </div>
+    <div class="music-now" id="mu-now"></div>
+    <h3 class="mu-h">国道13号沿線 13 市町村の歌 <small>MV は YouTube で開きます</small></h3>
+    <div class="music-grid" id="mu-list"></div>
+    <p class="hint">リンクは端末の YouTube アプリまたはブラウザで開きます（ゲームは通信しません）。走行中に開いたときは一時停止のままです。設定の「BGMの曲」で「んだんだ！やまがた」に切り替えられます。</p>
+  </div>
+</section>
+
+<!-- ================= HOWTO ================= -->
+<section id="scr-howto" class="screen panel-screen">
+  <header><button class="back" data-nav="title">‹ 戻る</button><h2>遊び方</h2></header>
+  <div class="howto-body">
+    <div class="howto-grid">
+      <div class="howto-card"><b>📱 ハンドル</b>端末を左右に傾けて操舵。出発直前の約1.2秒で持ちやすい角度を中立にします。設定でタッチボタンに切替できます。</div>
+      <div class="howto-card"><b>🦶 ペダル</b>右下 ACCEL で加速、左下 BRAKE で減速・停止。両方離すと 60 km/h で巡行します。止まり続けるときは BRAKE を押し続けます。</div>
+      <div class="howto-card"><b>🚦 交通ルール</b>左側通行。黄色の中央線は追い越し・はみ出し禁止。赤信号の停止線を越えると信号無視。自動速度取締りは 63 km/h を超えると減点。</div>
+      <div class="howto-card"><b>✨ ドライブコンボ</b>違反・事故・路肩走行・不要な急ブレーキをせずに走ると 1,000 mごとに倍率アップ（最大1.5倍）。</div>
+      <div class="howto-card"><b>🎁 道の駅・給油</b>左側の停車枠（緑の枠）に入り、ほぼ止まった状態を約1秒保つと特産品の獲得や給油ができます。</div>
+      <div class="howto-card"><b>🎓 ご当地クイズ</b>道の駅で特産品をもらったあと、そのまちにちなんだ3択クイズに挑戦できます。正解で +300 点。正解した問題は山形図鑑に記録されます（時間は止まっています）。</div>
+      <div class="howto-card"><b>⏱ 区間タイム</b>まちの境界ごとに区間タイムを確定。標準タイム（平均70 km/h＋12秒）より速い、または過去順位上位でボーナス。</div>
+      <div class="howto-card"><b>⛽ 燃料</b>タンクは5 L。全行程は途中の給油が必要です。ガス欠は2,000点減点。</div>
+      <div class="howto-card"><b>🌸🌻🍁⛄ 四季</b>タイトルで季節を選べます。夏は東根～村山で雷雨、冬は大石田～尾花沢～舟形で降雪。路面が滑りやすく、ブレーキが効きにくく、カーブで外へ流れます。</div>
+      <div class="howto-card"><b>👻 ゴーストカー</b>完走すると最速の走りがゴーストとして保存されます。出発前に家族や自分のゴーストを選ぶと半透明の車が走り、区間ごとの差がわかります（接触しません）。</div>
+      <div class="howto-card"><b>📷 写真モード</b>一時停止 →「写真モード」。ドラッグで視点を回し、📷で端末のピクチャに保存。共有ボタンからSNSへ送れます。</div>
+      <div class="howto-card"><b>📤 結果カード</b>完走すると、得点・タイム・走ったまち・ゴールの景色を1枚にまとめた画像を作れます。端末に保存して、共有ボタンからSNSや家族へ送れます。</div>
+      <div class="howto-card"><b>🛣 中央線の見方</b>黄色の二重線＝はみ出し禁止。白の実線＝片側2車線以上の区間の中央線。白の破線＝片側1車線で、対向車がいなければ追い越しのためにはみ出せます。</div>
+      <div class="howto-card"><b>🖼 名所カード</b>沿道に名所の案内板が立ち、近づくと画面の上に絵と紹介文のカードが出ます。カードを押すと走行が止まり、くわしい紹介を読めます（時間は進みません）。出会ったカードは山形図鑑に集まります。</div>
+      <div class="howto-card"><b>🗺 沿線の景色</b>各市町村の沿道を、国道13号の実際の並び（市街地・水田・果樹園・峠・川・トンネル）に合わせて描いています。進行方向の左が西、右が東。見どころは走行中に案内します。</div>
+      <div class="howto-card"><b>🔰 初心者向けの補助</b>設定の「操舵アシスト」で車線の中央へ戻り、「速度注意表示」で制限速度や推奨速度を案内します。タイトルの「はじめてのドライブ」で約5分の練習ができます。</div>
+      <div class="howto-card"><b>♪ BGM</b>走行中は、いま走っている市町村の歌（山形たびめぐり音楽帳）が流れ、新しいまちに入ると次の歌へ切り替わります。設定の「BGMの曲」で「んだんだ！やまがた」に変更できます。<span class="howto-links"><button class="btn small" data-nav="music">♪ 楽曲紹介を見る</button></span><small>市町村ソング 制作・発信：<a href="https://www.youtube.com/@ymgt_evelog" data-ext>山形イベログ</a></small></div>
+      <div class="howto-card" id="howto-about"><b>ℹ このアプリについて</b>「山形ドライブ R13」は山形イベログが個人で制作した<b class="em">非公式</b>のゲームです。山形県・各市町村・国・道の駅などの公式アプリではありません。道路・施設の配置や距離はゲーム用に構成したもので、実際の道路とは異なります。個人情報を集めず、外部へ送信もしません。<span class="howto-links"><a href="https://ymgtevelog.github.io/yamagata_r13/privacy.html" data-ext>プライバシーポリシー</a></span></div>
+      <div class="howto-card"><b>⌨ PC操作</b>←→ / A D：操舵　Space / ↓：ブレーキ　Shift / ↑：アクセル　C：視点　Esc：戻る</div>
+    </div>
+    <p class="hint">道路・施設配置・距離・取締りはゲーム用に構成したものです。実際の道路では交通法規を守り、安全運転でお楽しみください。</p>
+  </div>
+</section>
+
+<!-- ================= HUD ================= -->
+<section id="hud" class="screen">
+  <div class="hud-top">
+    <div class="hud-loc">
+      <div class="loc-region" id="h-region">米沢</div>
+      <div class="loc-driver" id="h-driver">DRIVER</div>
+    </div>
+    <div class="hud-progress">
+      <div class="prog-label"><span id="h-next">次：高畠</span><span id="h-remain">残り 4.0 km</span></div>
+      <div class="prog-bar"><div id="h-prog"></div><div id="h-prog-car">🚗</div></div>
+      <div class="prog-sub"><span id="h-course">全行程</span><span id="h-segtime">区間 0:00.00 / 標準 3:37.71</span></div>
+    </div>
+    <div class="hud-score">
+      <div class="score-num" id="h-score">0</div>
+      <div class="score-sub"><span id="h-combo" class="combo">×1.0</span><span id="h-mis">✓0/3</span></div>
+    </div>
+    <div class="hud-buttons">
+      <button id="b-mission" class="hbtn">✓</button>
+      <button id="b-view" class="hbtn">◉</button>
+      <button id="b-pause" class="hbtn">Ⅱ</button>
+    </div>
+  </div>
+  <div class="hud-alerts" id="h-alerts"></div>
+  <div class="hud-toasts" id="h-toasts"></div>
+  <div class="hud-banner" id="h-banner"></div>
+  <button class="hud-card" id="h-card" type="button" aria-label="名所カードの詳細を見る"></button>
+  <div class="hud-seg" id="h-seg"></div>
+  <div class="hud-ghost" id="h-ghost"></div>
+  <div class="hud-tut" id="h-tut"></div>
+  <div class="hud-advice" id="h-advice"></div>
+
+  <div class="hud-bottom">
+    <div class="meter">
+      <div class="m-speed"><span id="h-speed">0</span><small>km/h</small></div>
+      <div class="m-gear" id="h-gear">N</div>
+      <div class="m-bars">
+        <div class="bar-row"><label>耐久</label><div class="bar"><div id="h-dur"></div></div><span id="h-dur-t">100</span></div>
+        <div class="bar-row"><label>燃料</label><div class="bar fuel"><div id="h-fuel"></div></div><span id="h-fuel-t">5.00 L</span></div>
+      </div>
+      <div class="m-eco"><span id="h-kmpl">-- km/L</span><div class="steer"><div id="h-steer"></div></div></div>
+    </div>
+  </div>
+
+  <div id="pedal-brake" class="pedal brake"><span>BRAKE</span></div>
+  <div id="pedal-accel" class="pedal accel"><span>ACCEL</span></div>
+  <div id="steer-left" class="steerbtn left">◀</div>
+  <div id="steer-right" class="steerbtn right">▶</div>
+</section>
+
+<!-- ================= OVERLAYS ================= -->
+<div id="ov-count" class="overlay">
+  <div class="count-box">
+    <div class="count-course" id="c-course"></div>
+    <div class="count-num" id="c-num">3</div>
+    <div class="count-calib" id="c-calib">端末を持ちやすい角度で構えてください</div>
+    <div class="count-missions" id="c-missions"></div>
+  </div>
+</div>
+
+<div id="ov-pause" class="overlay modal">
+  <div class="dialog">
+    <h2>一時停止</h2>
+    <div class="pause-info" id="p-info"></div>
+    <button class="btn big primary" id="p-resume">▶ 走行を再開</button>
+    <div class="row">
+      <button class="btn" id="p-view">視点切替</button>
+      <button class="btn" id="p-photo">📷 写真モード</button>
+      <button class="btn" id="p-settings">設定</button>
+      <button class="btn" id="p-music">♪ 楽曲紹介</button>
+      <button class="btn" id="p-title">保存してタイトルへ</button>
+    </div>
+  </div>
+</div>
+
+<div id="ov-mission" class="overlay modal">
+  <div class="dialog">
+    <h2>旅のミッション</h2>
+    <div id="m-list" class="mission-list"></div>
+    <button class="btn primary" id="m-close">閉じて走行を続ける</button>
+  </div>
+</div>
+
+<div id="ov-sight" class="overlay modal top">
+  <div class="dialog wide sight" id="sight-box"></div>
+</div>
+
+<div id="ov-police" class="overlay police">
+  <div class="police-box">
+    <div class="police-lights"><i></i><i></i></div>
+    <div class="police-title">🚓 取締り</div>
+    <div class="police-reason" id="pol-reason"></div>
+    <div class="police-pen" id="pol-pen"></div>
+    <div class="police-note">安全運転でドライブを続けましょう</div>
+  </div>
+</div>
+
+<div id="ov-service" class="overlay modal">
+  <div class="dialog service" id="svc-box"></div>
+</div>
+
+<div id="ov-event" class="overlay modal">
+  <div class="dialog" id="ev-box"></div>
+</div>
+
+<div id="ov-result" class="overlay modal">
+  <div class="dialog wide result" id="res-box"></div>
+</div>
+
+<div id="ov-card" class="overlay modal top">
+  <div class="dialog wide card" id="card-box"></div>
+</div>
+
+<div id="photo-ui" class="photo-ui">
+  <div class="photo-hint">ドラッグで視点を回転　スライダーで距離・高さ　📷で端末に保存</div>
+  <div class="photo-bar">
+    <button class="btn" id="ph-back">‹ 戻る</button>
+    <label>距離<input type="range" id="ph-dist" min="3" max="40" step="0.5" value="9"></label>
+    <label>高さ<input type="range" id="ph-pitch" min="-5" max="75" step="1" value="14"></label>
+    <label>画角<input type="range" id="ph-fov" min="25" max="80" step="1" value="50"></label>
+    <button class="btn" id="ph-hud">表示：なし</button>
+    <button class="btn primary shutter" id="ph-shot">📷</button>
+  </div>
+</div>
+
+<div id="ov-confirm" class="overlay modal top">
+  <div class="dialog" id="cf-box"></div>
+</div>
+
+<script src="lib/three.min.js"></script>
+<script src="js/route-data.js"></script>
+<script src="js/web-host.js"></script>
+<script src="js/garage.js"></script>
+<script src="js/journey.js"></script>
+<script src="js/traffic-rules.js"></script>
+<script src="js/records.js"></script>
+<script src="js/quiz.js"></script>
+<script src="js/sights.js"></script>
+<script src="sights/photos.js"></script>
+<script src="js/simulation.js"></script>
+<script src="js/ghost.js"></script>
+<script src="js/renderer.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/music.js"></script>
+<script src="js/data-control.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>

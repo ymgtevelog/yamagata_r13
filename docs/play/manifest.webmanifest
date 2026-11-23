@@ -1,0 +1,17 @@
+{
+  "name": "山形ドライブ R13",
+  "short_name": "山形ドライブ",
+  "description": "国道13号を米沢から金山まで、沿線13市町村をめぐる3Dドライブゲーム（非公式・広告なし）",
+  "lang": "ja",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#0d1720",
+  "theme_color": "#1f3b57",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
