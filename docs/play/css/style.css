@@ -509,6 +509,32 @@ table.rank td.num { text-align: right; font-variant-numeric: tabular-nums; }
 .hud-card .go { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0 9px 0 3px; font-size: 10px; font-weight: 800; color: #ffd98a; line-height: 1.15; }
 .hud-card .go::before { content: '›'; font-size: 24px; line-height: .8; color: #fff; }
 .hud-card .bar { position: absolute; left: 0; bottom: 0; height: 3px; background: #ffd98a; width: 100%; transform-origin: left center; animation: cardBar linear forwards; }
+/* 1.0.1：表示から数秒で名前だけの小さな札に縮め、前方を見やすくする。縦の短い画面（ブラウザ版など）は最初から小さめ・半透明 */
+.hud-card { transition: opacity .3s ease; }
+.hud-card.mini { background: rgba(91,61,38,.72); box-shadow: 0 3px 10px rgba(0,0,0,.3), inset 0 0 0 1.5px rgba(244,234,210,.8); width: auto; max-width: min(330px, 44vw); border-radius: 999px; animation: cardMini .35s ease-out; }
+.hud-card.mini.on { max-height: 34px; }
+.hud-card.mini img, .hud-card.mini .tg, .hud-card.mini small { display: none; }
+.hud-card.mini .tx { padding: 5px 4px 6px 14px; }
+.hud-card.mini b { font-size: 14px; }
+.hud-card.mini .go { flex-direction: row; gap: 3px; padding: 0 13px 0 4px; font-size: 10px; }
+.hud-card.mini .go::before { font-size: 18px; line-height: 1; }
+.hud-card.mini .bar { height: 2px; }
+.hud-card.mini.out { animation: cardOut .4s ease-in forwards; }
+@keyframes cardMini { from { opacity: .4; } to { opacity: 1; } }
+@media (max-height: 430px) and (orientation: landscape) {
+  .hud-card { width: min(290px, 40vw); background: rgba(91,61,38,.86); }
+  .hud-card.on { max-height: 54px; }
+  .hud-card img { width: 68px; height: 47px; }
+  .hud-card .tx { padding: 3px 6px 4px 8px; }
+  .hud-card .tg { font-size: 9.5px; }
+  .hud-card b { font-size: 14px; }
+  .hud-card small { font-size: 10.5px; display: block; white-space: nowrap; text-overflow: ellipsis; }
+  .hud-card .go { padding: 0 7px 0 2px; font-size: 9.5px; }
+  .hud-card .go::before { font-size: 20px; }
+  .hud-card.mini.on { max-height: 30px; }
+  .hud-card.mini b { font-size: 13px; }
+  .hud-card.mini .tx { padding: 4px 3px 5px 12px; }
+}
 @keyframes cardIn { from { opacity: 0; transform: translate(-50%, -14px) scale(.94); } to { opacity: 1; transform: translate(-50%, 0) scale(1); } }
 @keyframes cardOut { to { opacity: 0; transform: translate(-50%, -10px); } }
 @keyframes cardBar { from { transform: scaleX(1); } to { transform: scaleX(0); } }

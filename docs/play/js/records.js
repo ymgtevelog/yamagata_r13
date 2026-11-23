@@ -11,7 +11,8 @@
   const DEFAULT_SETTINGS = {
     steer: 'tilt', sens: 1.0, invert: false, quality: 'standard', scenery: 'clear',
     bgm: true, se: true, vibe: true, shake: true, view: 'chase',
-    season: 'autumn', assist: false, speedWarn: false, tutorialDone: false, bgmMode: 'town'
+    season: 'autumn', assist: false, speedWarn: false, tutorialDone: false, bgmMode: 'town',
+    card: 'full'   // 名所カード：full=イラスト付き / brief=最初だけイラスト / name=名前だけ
   };
 
   // --- storage with graceful fallback ---

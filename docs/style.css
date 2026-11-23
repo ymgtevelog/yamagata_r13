@@ -22,3 +22,10 @@ footer { margin-top: 40px; font-size: 13px; color: var(--muted); }
 a, td, li, p { overflow-wrap: anywhere; }
 @media (max-width: 520px) { th { white-space: normal; width: 6.5em; } h1 { font-size: 20px; } }
 a.play { display: inline-block; background: #9F3F36; color: #fff; text-decoration: none; font-weight: 800; padding: 12px 20px; border-radius: 12px; font-size: 18px; box-shadow: 0 3px 0 #6e2a24; }
+a.play.apk { background: #2e5a7a; box-shadow: 0 3px 0 #1f3b57; font-size: 16px; }
+details.sum { margin: 8px 0 4px; font-size: 13px; }
+details.sum summary { cursor: pointer; font-weight: 700; }
+details.sum table { border-collapse: collapse; margin-top: 6px; width: 100%; }
+details.sum th, details.sum td { text-align: left; vertical-align: top; padding: 4px 6px; border-top: 1px solid rgba(127,127,127,.3); }
+details.sum th { white-space: nowrap; font-weight: 700; }
+details.sum code { word-break: break-all; font-size: 12px; }

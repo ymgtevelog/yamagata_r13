@@ -1,6 +1,6 @@
 /* 山形ドライブ R13 ブラウザ版の service worker：一度開いたファイルを端末に保存し、電波がなくても遊べるようにする。
    版が変わると CACHE の名前が変わり、古い保存は消える。 */
-const CACHE = 'r13-1.0.0-202611232259';
+const CACHE = 'r13-1.0.1-202611232352';
 const CORE = ["./", "css/style.css", "icons/apple-touch-icon.png", "icons/icon-192.png", "icons/icon-512.png", "icons/icon-maskable-512.png", "index.html", "js/audio.js", "js/data-control.js", "js/game.js", "js/garage.js", "js/ghost.js", "js/journey.js", "js/music.js", "js/quiz.js", "js/records.js", "js/renderer.js", "js/route-data.js", "js/sights.js", "js/simulation.js", "js/traffic-rules.js", "js/web-host.js", "lib/three.min.js", "manifest.webmanifest", "sights/photos.js"];
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(CORE); }).then(function () { return self.skipWaiting(); }));

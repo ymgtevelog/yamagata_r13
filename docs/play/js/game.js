@@ -399,9 +399,10 @@
       seg('scenery', '景観', [['clear', '青空と実りの道'], ['sunset', '夕映え'], ['rain', '雨上がり']]) +
       onoff('bgm', 'BGM') + seg('bgmMode', 'BGMの曲', [['town', '市町村ソング'], ['classic', 'んだんだ！やまがた']]) + onoff('se', 'エンジン音と効果音') + onoff('vibe', '振動') + onoff('shake', 'カメラ揺れ') +
       seg('view', '視点', [['chase', '追従'], ['bonnet', 'ボンネット']]) +
+      seg('card', '名所カード', [['full', 'イラスト付き'], ['brief', '最初だけイラスト'], ['name', '名前だけ']]) +
       seg('season', '季節（次の旅）', RT.SEASONS.map(function (x) { return [x.id, x.icon + x.name]; })) +
       onoff('assist', '🔰 操舵アシスト') + onoff('speedWarn', '🔰 速度注意表示');
-    html += '<p class="hint about-line">山形ドライブ R13 ver 1.0.0（非公式・個人制作）　<a href="' + R13.music.PRIVACY + '" data-ext>プライバシーポリシー</a></p>';
+    html += '<p class="hint about-line">山形ドライブ R13 ver 1.0.1（非公式・個人制作）　<a href="' + R13.music.PRIVACY + '" data-ext>プライバシーポリシー</a></p>';
     if (!fromPause) html += '<div class="danger-zone"><div><b>全履歴消去</b><div class="hint">全ドライバー、全コース記録、途中の旅、図鑑、解放ポイント、旧版の記録を消去します。描画や音などの設定は残ります。</div></div><button class="btn danger" id="set-erase">全履歴消去…</button></div>';
     else html += '<p class="hint" style="grid-column:1/-1">データの消去はタイトル画面の設定から行えます。</p>';
     if (host && host.hasSensor && !host.hasSensor()) html += '<p class="hint" style="grid-column:1/-1">この端末では傾きセンサーが見つからないため、タッチボタンで操舵します。</p>';
@@ -438,6 +439,7 @@
     if (key === 'bgmMode') this.audio.setBgmMode(v);
     if (key === 'se') this.audio.setSe(v);
     if (key === 'view') r.camMode = v;
+    if (key === 'card' && this._cardCur) $('h-card').classList.toggle('mini', v === 'name' || (v === 'brief' && this._cardT <= CARD_SEC - CARD_FULL_SEC));
     if (key === 'season' && !this.sim) { r.setSeason(v); r.warm(this.showcaseS); }
     this._applySteerMode();
     this.audio.sfx('tap');
@@ -454,7 +456,7 @@
     if (host || !R13.web) return;
     const W = R13.web, self = this;
     document.documentElement.classList.add('web');
-    $('ver-line').innerHTML = '山形ドライブ R13 ver 1.0.0　ブラウザ版・非公式<br>広告／課金なし';
+    $('ver-line').innerHTML = '山形ドライブ R13 ver 1.0.1　ブラウザ版・非公式<br>広告／課金なし';
     W.tilt.onChange = function () { self._applySteerMode(); if (self.screen === 'settings') self._renderSettings(); };
     // iPhone の Safari で開いているとき：ホーム画面への追加を案内
     let hide = false; try { hide = localStorage.getItem('r13.a2hs') === '1'; } catch (e) { }
@@ -876,6 +878,7 @@
   // ---------------------------------------------------------------- 名所カード
   const SG = R13.sights;
   const CARD_SEC = 10;
+  const CARD_FULL_SEC = 3.5;
   Game._cardReset = function () {
     const s = this.sim ? this.sim.st.s : 0;
     let i = 0;
@@ -886,15 +889,16 @@
   Game._cardHide = function (now) {
     const el = $('h-card');
     this._cardCur = null; this._cardT = 0;
-    if (now || !el.classList.contains('on')) { el.classList.remove('on', 'out'); return; }
+    if (now || !el.classList.contains('on')) { el.classList.remove('on', 'out', 'mini'); return; }
     el.classList.add('out');
-    setTimeout(function () { if (el.classList.contains('out')) el.classList.remove('on', 'out'); }, 420);
+    setTimeout(function () { if (el.classList.contains('out')) el.classList.remove('on', 'out', 'mini'); }, 420);
   };
   Game._cardShow = function (c, isNew) {
     const el = $('h-card'), reg = RT.REGIONS.filter(function (r) { return r.id === c.region; })[0];
     el.innerHTML = '<img alt="" src="' + SG.dataUrl(c, 192, 132) + '"><span class="tx"><span class="tg">' + esc(reg.name + reg.muni) + 'の名所' + (isNew ? '<i>NEW</i>' : '') + '</span><b>' + esc(c.name) + '</b><small>' + esc(c.short) + '</small></span>' +
       '<span class="go">くわしく</span><span class="bar" style="animation-duration:' + CARD_SEC + 's"></span>';
-    el.classList.remove('on', 'out'); void el.offsetWidth; el.classList.add('on');
+    el.classList.remove('on', 'out', 'mini'); void el.offsetWidth; el.classList.add('on');
+    if (this.settings.card === 'name') el.classList.add('mini');
     this._cardCur = c; this._cardT = CARD_SEC;
   };
   Game._cards = function (dt) {
@@ -911,7 +915,12 @@
         if (isNew) this.audio.sfx('tap');
       }
     }
-    if (this._cardCur) { this._cardT -= dt; if (this._cardT <= 0) this._cardHide(); }
+    if (this._cardCur) {
+      this._cardT -= dt;
+      // 設定「最初だけイラスト」：3.5 秒たったら名前だけの小さな札にして、前方を見やすくする（タップで詳細を開けるのは同じ）
+      if (this.settings.card === 'brief' && this._cardT <= CARD_SEC - CARD_FULL_SEC) { const el = $('h-card'); if (!el.classList.contains('mini')) el.classList.add('mini'); }
+      if (this._cardT <= 0) this._cardHide();
+    }
   };
   // 名所カードの詳細。走行中に開いたときは走行を止め（時間は進まない）、閉じるとそのまま走行にもどる。
   Game._openSight = function (id) {

@@ -10,6 +10,8 @@ build/
 dist/
 *.apk
 *.aab
+# 例外：紹介ページから配布する APK
+!docs/download/*.apk
 *.apks
 .DS_Store
 Thumbs.db
