@@ -402,7 +402,7 @@
       seg('card', '名所カード', [['full', 'イラスト付き'], ['brief', '最初だけイラスト'], ['name', '名前だけ']]) +
       seg('season', '季節（次の旅）', RT.SEASONS.map(function (x) { return [x.id, x.icon + x.name]; })) +
       onoff('assist', '🔰 操舵アシスト') + onoff('speedWarn', '🔰 速度注意表示');
-    html += '<p class="hint about-line">山形ドライブ R13 ver 1.0.1（非公式・個人制作）　<a href="' + R13.music.PRIVACY + '" data-ext>プライバシーポリシー</a></p>';
+    html += '<p class="hint about-line">山形ドライブ R13 ver 1.0.2（非公式・個人制作）　<a href="' + R13.music.PRIVACY + '" data-ext>プライバシーポリシー</a></p>';
     if (!fromPause) html += '<div class="danger-zone"><div><b>全履歴消去</b><div class="hint">全ドライバー、全コース記録、途中の旅、図鑑、解放ポイント、旧版の記録を消去します。描画や音などの設定は残ります。</div></div><button class="btn danger" id="set-erase">全履歴消去…</button></div>';
     else html += '<p class="hint" style="grid-column:1/-1">データの消去はタイトル画面の設定から行えます。</p>';
     if (host && host.hasSensor && !host.hasSensor()) html += '<p class="hint" style="grid-column:1/-1">この端末では傾きセンサーが見つからないため、タッチボタンで操舵します。</p>';
@@ -456,7 +456,7 @@
     if (host || !R13.web) return;
     const W = R13.web, self = this;
     document.documentElement.classList.add('web');
-    $('ver-line').innerHTML = '山形ドライブ R13 ver 1.0.1　ブラウザ版・非公式<br>広告／課金なし';
+    $('ver-line').innerHTML = '山形ドライブ R13 ver 1.0.2　ブラウザ版・非公式<br>広告／課金なし';
     W.tilt.onChange = function () { self._applySteerMode(); if (self.screen === 'settings') self._renderSettings(); };
     // iPhone の Safari で開いているとき：ホーム画面への追加を案内
     let hide = false; try { hide = localStorage.getItem('r13.a2hs') === '1'; } catch (e) { }
@@ -1244,6 +1244,17 @@
     font(800, 30); const sl = D.seasonIcon + ' ' + D.seasonName, sw2 = g.measureText(sl).width + 44;
     g.fillStyle = 'rgba(14,26,38,0.6)'; rr(W - 40 - sw2, 34, sw2, 56, 28); g.fill();
     g.fillStyle = '#fff'; g.fillText(sl, W - 40 - sw2 + 22, 73);
+    // 紹介ページの QR コード（左上。白い台紙に載せ、読み取りやすいよう周りに余白をとる）
+    const QR = R13.QR_SITE;
+    if (QR && QR.rows && QR.rows.length) {
+      const qn = QR.rows.length, cell = Math.floor(150 / qn), qs = cell * qn, pad = cell * 3, bw = qs + pad * 2, bx = 36, by = 34;
+      g.fillStyle = 'rgba(14,26,38,0.35)'; rr(bx + 3, by + 5, bw, bw + 40, 18); g.fill();
+      g.fillStyle = '#ffffff'; rr(bx, by, bw, bw + 40, 18); g.fill();
+      g.fillStyle = '#16324a';
+      for (let yy = 0; yy < qn; yy++) for (let xx = 0; xx < qn; xx++) if (QR.rows[yy].charAt(xx) === '1') g.fillRect(bx + pad + xx * cell, by + pad + yy * cell, cell, cell);
+      g.textAlign = 'center'; font(800, 17); g.fillText('ゲームの紹介・遊ぶ', bx + bw / 2, by + bw + 22);
+      g.textAlign = 'left';
+    }
     // 得点
     g.fillStyle = '#8a8272'; font(800, 28); g.fillText('SCORE', 56, 632);
     g.fillStyle = '#b3261e'; font(900, 150);
@@ -1294,7 +1305,7 @@
   };
   Game._cardText = function (D) {
     return '山形ドライブ R13「' + D.courseName + '（' + D.courseLabel + '）」を完走！ ' + Math.floor(D.score).toLocaleString('ja-JP') + '点　タイム ' + RU.formatTime(D.time) +
-      ' #山形ドライブR13 #国道13号 #山形県';
+      ' #山形ドライブR13 #国道13号 #山形県 ' + ((R13.QR_SITE && R13.QR_SITE.url) || 'https://ymgtevelog.github.io/yamagata_r13/');
   };
   Game.openCard = function () {
     const D = this._cardData, self = this;

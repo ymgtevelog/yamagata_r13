@@ -10,7 +10,9 @@
 - BGM：[山形たびめぐり音楽帳](https://www.youtube.com/playlist?list=PLCg-62_Qkruc)（制作・発信：[山形イベログ](https://www.youtube.com/@ymgt_evelog)）
 - パッケージ名：`jp.ymgtevelog.drive13`
 
-お問い合わせや不具合の報告は [Issues](https://github.com/ymgtevelog/yamagata_r13/issues) または ymgt.evelog@gmail.com へお願いします。
+不具合の報告やお問い合わせは、Discord サーバー「[山形ドライブ R13](https://discord.gg/DbBp5qREY)」または ymgt.evelog@gmail.com へお願いします。
+
+Google Play 公開に向けたベータテスターを[募集しています](https://forms.gle/B7wKQ6jXHzxBBDWKA)。
 
 本アプリは個人が制作した非公式のゲームで、山形県・各市町村・国・道の駅などの公式アプリではありません。
 

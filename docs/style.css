@@ -29,3 +29,4 @@ details.sum table { border-collapse: collapse; margin-top: 6px; width: 100%; }
 details.sum th, details.sum td { text-align: left; vertical-align: top; padding: 4px 6px; border-top: 1px solid rgba(127,127,127,.3); }
 details.sum th { white-space: nowrap; font-weight: 700; }
 details.sum code { word-break: break-all; font-size: 12px; }
+a.play.beta { background: #2f7a4a; box-shadow: 0 3px 0 #1f5232; font-size: 16px; }
