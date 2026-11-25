@@ -402,7 +402,7 @@
       seg('card', '名所カード', [['full', 'イラスト付き'], ['brief', '最初だけイラスト'], ['name', '名前だけ']]) +
       seg('season', '季節（次の旅）', RT.SEASONS.map(function (x) { return [x.id, x.icon + x.name]; })) +
       onoff('assist', '🔰 操舵アシスト') + onoff('speedWarn', '🔰 速度注意表示');
-    html += '<p class="hint about-line">山形ドライブ R13 ver 1.0.2（非公式・個人制作）　<a href="' + R13.music.PRIVACY + '" data-ext>プライバシーポリシー</a></p>';
+    html += '<p class="hint about-line">山形ドライブ R13 ver 1.0.3（非公式・個人制作）　<a href="' + R13.music.PRIVACY + '" data-ext>プライバシーポリシー</a></p>';
     if (!fromPause) html += '<div class="danger-zone"><div><b>全履歴消去</b><div class="hint">全ドライバー、全コース記録、途中の旅、図鑑、解放ポイント、旧版の記録を消去します。描画や音などの設定は残ります。</div></div><button class="btn danger" id="set-erase">全履歴消去…</button></div>';
     else html += '<p class="hint" style="grid-column:1/-1">データの消去はタイトル画面の設定から行えます。</p>';
     if (host && host.hasSensor && !host.hasSensor()) html += '<p class="hint" style="grid-column:1/-1">この端末では傾きセンサーが見つからないため、タッチボタンで操舵します。</p>';
@@ -456,7 +456,7 @@
     if (host || !R13.web) return;
     const W = R13.web, self = this;
     document.documentElement.classList.add('web');
-    $('ver-line').innerHTML = '山形ドライブ R13 ver 1.0.2　ブラウザ版・非公式<br>広告／課金なし';
+    $('ver-line').innerHTML = '山形ドライブ R13 ver 1.0.3　ブラウザ版・非公式<br>広告／課金なし';
     W.tilt.onChange = function () { self._applySteerMode(); if (self.screen === 'settings') self._renderSettings(); };
     // iPhone の Safari で開いているとき：ホーム画面への追加を案内
     let hide = false; try { hide = localStorage.getItem('r13.a2hs') === '1'; } catch (e) { }
@@ -1191,6 +1191,8 @@
       quiz: st.quiz ? { ok: st.quiz.ok, n: st.quiz.n } : null,
       items: st.items.map(function (i) { return RT.ITEMS[i].icon; }),
       regions: st.regions.map(function (id) { const r = RT.REGIONS.filter(function (x) { return x.id === id; })[0]; return r ? r.name : id; }),
+      courseId: st.courseId,
+      verify: (st.courseId === 'full' && R13.verify) ? R13.verify.make(score, now, st.time, st.driver) : null,
       date: now.getFullYear() + '.' + (now.getMonth() + 1) + '.' + now.getDate(), stamp: now, town: !!(this.settings.bgm && this.audio._useTown && this.audio._useTown())
     };
     this._cardUri = null; this._cardJpeg = null;
@@ -1254,6 +1256,19 @@
       for (let yy = 0; yy < qn; yy++) for (let xx = 0; xx < qn; xx++) if (QR.rows[yy].charAt(xx) === '1') g.fillRect(bx + pad + xx * cell, by + pad + yy * cell, cell, cell);
       g.textAlign = 'center'; font(800, 17); g.fillText('ゲームの紹介・遊ぶ', bx + bw / 2, by + bw + 22);
       g.textAlign = 'left';
+    }
+    // 1.0.3：記録の確認用 QR コード（右上、季節の札の下）。全行程を完走したカードだけ。読み取ると確認ページが開き、得点・日付・タイム・名前が正しい組み合わせかを確かめられる
+    if (D.verify && R13.verify && typeof qrcode === 'function') {
+      try {
+        const q = qrcode(0, 'M'); q.addData(R13.verify.url(D.verify)); q.make();
+        const qn = q.getModuleCount(), cell = Math.max(3, Math.floor(190 / qn)), qs = cell * qn, pad = cell * 3, bw = qs + pad * 2, bx = W - 36 - bw, by = 112;
+        g.fillStyle = 'rgba(14,26,38,0.35)'; rr(bx + 3, by + 5, bw, bw + 40, 18); g.fill();
+        g.fillStyle = '#ffffff'; rr(bx, by, bw, bw + 40, 18); g.fill();
+        g.fillStyle = '#111111';
+        for (let yy = 0; yy < qn; yy++) for (let xx = 0; xx < qn; xx++) if (q.isDark(yy, xx)) g.fillRect(bx + pad + xx * cell, by + pad + yy * cell, cell, cell);
+        g.fillStyle = '#16324a'; g.textAlign = 'center'; font(800, 17); g.fillText('✔ 記録の確認用', bx + bw / 2, by + bw + 22);
+        g.textAlign = 'left';
+      } catch (e) { }
     }
     // 得点
     g.fillStyle = '#8a8272'; font(800, 28); g.fillText('SCORE', 56, 632);

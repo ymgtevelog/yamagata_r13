@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>記録の確認 — 山形ドライブ R13</title>
+<meta name="description" content="山形ドライブ R13 の結果カードにある「記録の確認用」QRコードの内容が正しいかを確かめるページです。">
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="../style.css">
+<style>
+  .verdict { border-radius: 14px; padding: 16px 18px; margin: 8px 0 14px; font-weight: 800; font-size: 20px; line-height: 1.5; }
+  .verdict small { display: block; font-size: 14px; font-weight: 500; margin-top: 4px; }
+  .verdict.ok { background: #e5f4e4; color: #1f5232; box-shadow: inset 0 0 0 2px #2f7a4a; }
+  .verdict.ng { background: #fbebeb; color: #7a1f1a; box-shadow: inset 0 0 0 2px #b3261e; }
+  .verdict.none { background: var(--paper); color: var(--muted); box-shadow: inset 0 0 0 1px var(--line); font-size: 16px; font-weight: 600; }
+  .score { font-size: 30px; color: #b3261e; font-weight: 900; }
+  textarea { width: 100%; box-sizing: border-box; font: 14px/1.5 ui-monospace, Menlo, Consolas, monospace; padding: 8px; border-radius: 10px; border: 1px solid var(--line); background: var(--paper); color: var(--ink); }
+  button { font: inherit; font-weight: 800; padding: 8px 18px; border-radius: 10px; border: 0; background: #16324a; color: #fff; margin-top: 6px; cursor: pointer; }
+  code.cd { word-break: break-all; font-size: 13px; }
+</style>
+</head>
+<body>
+<main>
+  <header class="site">
+    <div class="shield" aria-hidden="true"><small>国道</small><b>13</b></div>
+    <h1>記録の確認<small>山形ドライブ R13 の結果カード</small></h1>
+  </header>
+
+  <div id="verdict" class="verdict none">結果カードの「✔ 記録の確認用」QR コードを読み取ると、ここに確認結果が出ます。</div>
+  <table id="detail" hidden>
+    <tr><th>得点</th><td><span class="score" id="d-score"></span> 点</td></tr>
+    <tr><th>完走タイム</th><td id="d-time"></td></tr>
+    <tr><th>完走した日</th><td id="d-date"></td></tr>
+    <tr><th>ドライバー</th><td id="d-name"></td></tr>
+    <tr><th>コース</th><td>全行程（米沢 → 金山 53 km）</td></tr>
+    <tr><th>確認コード</th><td><code class="cd" id="d-code"></code></td></tr>
+  </table>
+
+  <h2>コードを入力して確認</h2>
+  <p class="note">QR コードを読み取れないときは、コード（S で始まる 65 文字）を入力してください。</p>
+  <textarea id="in" rows="2" placeholder="S0098765xD20261125xT02393801xN00000000ABCDEFGHx…" spellcheck="false" autocomplete="off"></textarea>
+  <button id="go">確認する</button>
+
+  <h2>この確認でわかること</h2>
+  <ul>
+    <li>結果カードの得点・タイム・日付・ドライバー名は、ゲームが完走時に作る確認用の値（18 文字）と組み合わせて記録しています。どれか 1 文字でも書き換えると「一致しません」と表示されます。</li>
+    <li>画像の数字を加工した結果カードは、カードの表示と、ここに出る内容が食い違うことで見分けられます。<b>カードの表示と、上の得点・タイム・名前が同じか</b>も見比べてください。</li>
+    <li>このゲームは通信をせずに動くため、確認はゲームの中の計算と同じ方法で行っています。プログラムを解析すれば偽のコードを作れるため、完全な証明ではありません。高得点の紹介では、運営が必要に応じて追加の確認をお願いすることがあります。</li>
+    <li>このページは入力されたコードをどこにも送信しません（確認はお使いの端末の中だけで行います）。</li>
+  </ul>
+
+  <p style="margin-top:24px"><a class="play" href="../play/">▶ 山形ドライブ R13 をブラウザで遊ぶ</a></p>
+  <footer><a href="../">山形ドライブ R13 の紹介ページ</a>　／　<a href="../privacy.html">プライバシーポリシー</a></footer>
+</main>
+<script src="verify-code.js"></script>
+<script>
+(function () {
+  'use strict';
+  var V = window.R13 && R13.verify;
+  function $(id) { return document.getElementById(id); }
+  function show(code) {
+    var vd = $('verdict'), dt = $('detail');
+    if (!code) { vd.className = 'verdict none'; vd.textContent = '結果カードの「✔ 記録の確認用」QR コードを読み取ると、ここに確認結果が出ます。'; dt.hidden = true; return; }
+    var r = V.parse(code);
+    if (!r.format) {
+      vd.className = 'verdict ng'; vd.innerHTML = '確認コードの形が正しくありません。<small>読み取りや入力の途中で欠けていないか確かめてください。</small>'; dt.hidden = true; return;
+    }
+    $('d-score').textContent = r.score.toLocaleString('ja-JP');
+    $('d-time').textContent = r.timeText;
+    $('d-date').textContent = r.year + '年' + r.month + '月' + r.day + '日';
+    $('d-name').textContent = r.name || '（なし）';
+    $('d-code').textContent = r.code;
+    dt.hidden = false;
+    if (r.ok) { vd.className = 'verdict ok'; vd.innerHTML = '✔ 記録の内容と確認用の値が一致しました。<small>結果カードの表示が、下の得点・タイム・日付・名前と同じか見比べてください。</small>'; }
+    else { vd.className = 'verdict ng'; vd.innerHTML = '✖ 記録の内容と確認用の値が一致しません。<small>得点・タイム・日付・名前のいずれかが書き換えられている可能性があります。</small>'; }
+  }
+  function fromHash() { var h = location.hash.replace(/^#/, ''); if (h) $('in').value = decodeURIComponent(h); show(h); }
+  $('go').onclick = function () { show($('in').value); };
+  window.addEventListener('hashchange', fromHash);
+  fromHash();
+})();
+</script>
+</body>
+</html>
