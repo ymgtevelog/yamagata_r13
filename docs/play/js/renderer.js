@@ -1116,8 +1116,10 @@
         lineAt(yel, function () { return -0.12; }, s, s + 10, 0.15, Y);
         lineAt(yel, function () { return 0.12; }, s, s + 10, 0.15, Y);
       } else if (cst === 'wide') {
-        // 1.0.3：片側2車線以上で規制のない区間は、白の破線（車線境界線より太く、線を長く・すき間を短く）。白の実線ははみ出し禁止と受け取られるため使わない
-        lineAt(wht, function () { return 0; }, s + 1.5, s + 8.5, 0.21, Y);
+        // 1.0.4：片側2車線以上で規制のない区間は、白の二重の破線（線 8m・すき間 2m、各 18cm 幅、間隔 20cm）。
+        //        車線境界線（細い1本・5m／5m）と遠くの車線からでも見分けやすくする。白の実線ははみ出し禁止と受け取られるため使わない
+        lineAt(wht, function () { return -0.19; }, s + 1, s + 9, 0.18, Y);
+        lineAt(wht, function () { return 0.19; }, s + 1, s + 9, 0.18, Y);
       } else {
         lineAt(wht, function () { return 0; }, s, s + 5, 0.15, Y);      // 片側1車線：白の破線
       }
@@ -1924,7 +1926,7 @@
   }
 
   Renderer.signOutsideTunnel = signOutsideTunnel;
-  // 中央線：はみ出し禁止区間＝黄色の二重線、片側2車線以上＝太い白の破線（7m 引いて 3m あける・幅 21cm）、片側1車線＝白の破線（5m／5m）
+  // 中央線：はみ出し禁止区間＝黄色の二重線、片側2車線以上＝白の二重の破線（8m 引いて 2m あける）、片側1車線＝白の破線（5m／5m）
   //       車線境界線（同じ向きの車線の間）は細い白の破線（5m／5m・幅 13cm）
   function centerLineStyle(s) {
     if (RT.isYellow(s)) return 'yellow';
