@@ -4,6 +4,7 @@
 無料・広告なし・アプリ内購入なし。Android アプリのほか、iPhone・Android のブラウザでも遊べます。
 
 - ブラウザで遊ぶ：https://ymgtevelog.github.io/yamagata_r13/play/
+- 紹介動画（YouTube）：https://www.youtube.com/watch?v=wvXuZ5CzHQI
 - 操作説明の動画（YouTube）：https://www.youtube.com/watch?v=udiu85Q-stQ
 - Android の APK：https://ymgtevelog.github.io/yamagata_r13/ の「Android アプリ」からダウンロード
 - アプリの紹介：https://ymgtevelog.github.io/yamagata_r13/
