@@ -35,6 +35,7 @@
   }
   const AREA = { yonezawa: '置賜', takahata: '置賜', nanyo: '置賜', kaminoyama: '村山', yamagata: '村山', tendo: '村山', higashine: '村山',
     murayama: '村山', oishida: '村山', obanazawa: '村山', funagata: '最上', shinjo: '最上', kaneyama: '最上' };
-  R13.music = { CHANNEL: CHANNEL, PLAYLIST: PLAYLIST, PRIVACY: PRIVACY, MV: MV, AREA: AREA, allowed: allowed, open: open };
+  const TUTORIAL = 'https://www.youtube.com/watch?v=udiu85Q-stQ';   // 1.0.5：操作説明の動画（約2分）
+  R13.music = { CHANNEL: CHANNEL, PLAYLIST: PLAYLIST, PRIVACY: PRIVACY, TUTORIAL: TUTORIAL, MV: MV, AREA: AREA, allowed: allowed, open: open };
   if (typeof module !== 'undefined') module.exports = R13;
 })(typeof window !== 'undefined' ? window : globalThis);
