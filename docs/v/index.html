@@ -32,18 +32,20 @@
     <tr><th>完走タイム</th><td id="d-time"></td></tr>
     <tr><th>完走した日</th><td id="d-date"></td></tr>
     <tr><th>ドライバー</th><td id="d-name"></td></tr>
-    <tr><th>コース</th><td>全行程（米沢 → 金山 53 km）</td></tr>
+    <tr><th>ソフト</th><td id="d-game"></td></tr>
+    <tr><th>バージョン</th><td id="d-ver"></td></tr>
+    <tr><th>コース</th><td id="d-course">全行程</td></tr>
     <tr><th>確認コード</th><td><code class="cd" id="d-code"></code></td></tr>
   </table>
 
   <h2>コードを入力して確認</h2>
-  <p class="note">QR コードを読み取れないときは、コード（S で始まる 65 文字）を入力してください。</p>
-  <textarea id="in" rows="2" placeholder="S0098765xD20261125xT02393801xN00000000ABCDEFGHx…" spellcheck="false" autocomplete="off"></textarea>
+  <p class="note">QR コードを読み取れないときは、コード（S で始まる 74 文字）を入力してください。</p>
+  <textarea id="in" rows="2" placeholder="S0098765xD20261125xT02393801xN00000000ABCDEFGHxVYD30106x…" spellcheck="false" autocomplete="off"></textarea>
   <button id="go">確認する</button>
 
   <h2>この確認でわかること</h2>
   <ul>
-    <li>結果カードの得点・タイム・日付・ドライバー名は、ゲームが完走時に作る確認用の値（18 文字）と組み合わせて記録しています。どれか 1 文字でも書き換えると「一致しません」と表示されます。</li>
+    <li>結果カードの得点・タイム・日付・ドライバー名と、ソフトの種類・バージョンは、ゲームが完走時に作る確認用の値（18 文字）と組み合わせて記録しています。どれか 1 文字でも書き換えると「一致しません」と表示されます。</li>
     <li>画像の数字を加工した結果カードは、カードの表示と、ここに出る内容が食い違うことで見分けられます。<b>カードの表示と、上の得点・タイム・名前が同じか</b>も見比べてください。</li>
     <li>このゲームは通信をせずに動くため、確認はゲームの中の計算と同じ方法で行っています。プログラムを解析すれば偽のコードを作れるため、完全な証明ではありません。高得点の紹介では、運営が必要に応じて追加の確認をお願いすることがあります。</li>
     <li>このページは入力されたコードをどこにも送信しません（確認はお使いの端末の中だけで行います）。</li>
@@ -69,10 +71,13 @@
     $('d-time').textContent = r.timeText;
     $('d-date').textContent = r.year + '年' + r.month + '月' + r.day + '日';
     $('d-name').textContent = r.name || '（なし）';
+    $('d-game').textContent = (r.gameName || '不明なソフト') + '（' + r.game + '）';
+    $('d-ver').textContent = 'ver ' + r.versionText;
+    $('d-course').textContent = r.game === 'YD3' ? '全行程（米沢 → 金山 53 km）' : '全行程';
     $('d-code').textContent = r.code;
     dt.hidden = false;
     if (r.ok) { vd.className = 'verdict ok'; vd.innerHTML = '✔ 記録の内容と確認用の値が一致しました。<small>結果カードの表示が、下の得点・タイム・日付・名前と同じか見比べてください。</small>'; }
-    else { vd.className = 'verdict ng'; vd.innerHTML = '✖ 記録の内容と確認用の値が一致しません。<small>得点・タイム・日付・名前のいずれかが書き換えられている可能性があります。</small>'; }
+    else { vd.className = 'verdict ng'; vd.innerHTML = '✖ 記録の内容と確認用の値が一致しません。<small>得点・タイム・日付・名前・ソフト・バージョンのいずれかが書き換えられている可能性があります。</small>'; }
   }
   function fromHash() { var h = location.hash.replace(/^#/, ''); if (h) $('in').value = decodeURIComponent(h); show(h); }
   $('go').onclick = function () { show($('in').value); };

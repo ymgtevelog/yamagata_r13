@@ -1,22 +1,27 @@
 /* verify-code.js — 結果カードの「記録の確認コード」を作る・確かめる（ゲームと確認ページで同じファイルを使う）
 
-   コードの形（例：2026年11月25日に 98,765 点・2時間39分38秒01 で全行程を完走した ABCDEFGH さん）
-     S0098765xD20261125xT02393801xN00000000ABCDEFGHxTNWYXYG3PFMYHTF0MW
+   コードの形（例：2026年11月25日に 98,765 点・2時間39分38秒01 で全行程を完走した ABCDEFGH さん。山形ドライブ R13 ver 1.0.5）
+     S0098765xD20261125xT02393801xN00000000ABCDEFGHxVYD30105x8YTDSH7B8KR05RTF7H
      S  得点（7桁・左を0で埋める）
      D  完走した日（端末の日付 YYYYMMDD）
      T  完走タイム（時・分・秒・1/100秒 を各2桁）
      N  ドライバー名（A～Z・16文字。左を0で埋める）
+     V  ソフトの記号（英大文字・数字 3 文字。YD3＝山形ドライブ R13）＋バージョン（versionCode 4桁。1.0.5 → 0105）
      最後の18文字  確認用の値：
-       HMAC-SHA256（鍵, "R13V1|" + 上の4項目をxでつないだ文字列）の先頭90ビットを
+       HMAC-SHA256（鍵, "R13V2|" + 上の5項目をxでつないだ文字列）の先頭90ビットを
        Crockford Base32（0-9 と A-Z から I L O U を除いた32文字）で18文字にしたもの
    QR コードには確認ページの URL の後ろ（# の後）にこのコードを入れる。# の後ろはサーバーに送られない。
+   難易度の違う版や別のドライブゲームを出すときは、ソフトの記号を分けて GAMES に名前を足す（確認ページも同じファイルを使う）。
 
    注意：ゲームはオフラインで動くため、鍵はプログラムの中にある。画像の数字を書き換えただけの偽物は見分けられるが、
    プログラムを解析すれば作れてしまう。高得点の紹介など大事な場面では、運営による追加の確認（画面録画など）と組み合わせる。 */
 (function (G) {
   'use strict';
   const R13 = G.R13 = G.R13 || {};
-  const VERSION = 'R13V1';
+  const VERSION = 'R13V2';
+  // このソフトの記号とバージョン（versionCode）。バージョンを上げるときはここも直す（build.sh の VER と同じ）
+  const GAME = 'YD3', VERSION_CODE = 106;
+  const GAMES = { YD3: '山形ドライブ R13' };
   const PAGE = 'https://ymgtevelog.github.io/yamagata_r13/v/';
 
   // ---------------------------------------------------------------- SHA-256（同期・依存なし）
@@ -91,35 +96,38 @@
 
   // ---------------------------------------------------------------- コードを作る・読む
   function pad(n, w) { n = String(n); while (n.length < w) n = '0' + n; return n; }
-  function body(score, date, timeSec, name) {
+  function vcText(vc) { vc = +vc; return Math.floor(vc / 100) + '.' + (Math.floor(vc / 10) % 10) + '.' + (vc % 10); }
+  function body(score, date, timeSec, name, game, vcode) {
     const cs = Math.max(0, Math.round(timeSec * 100));
     const hh = Math.floor(cs / 360000), mm = Math.floor(cs / 6000) % 60, ss = Math.floor(cs / 100) % 60, cc = cs % 100;
     const d = date.getFullYear() * 10000 + (date.getMonth() + 1) * 100 + date.getDate();
     return 'S' + pad(Math.min(9999999, Math.max(0, Math.floor(score))), 7) + 'xD' + d + 'xT' + pad(Math.min(99, hh), 2) + pad(mm, 2) + pad(ss, 2) + pad(cc, 2) +
-      'xN' + pad(String(name || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 16), 16);
+      'xN' + pad(String(name || '').toUpperCase().replace(/[^A-Z]/g, '').slice(0, 16), 16) +
+      'xV' + String(game || GAME).toUpperCase().slice(0, 3) + pad(Math.min(9999, Math.max(0, vcode == null ? VERSION_CODE : vcode)), 4);
   }
   function sign(b) { return base32(hmac(key(), utf8(VERSION + '|' + b)), 18); }
-  function make(score, date, timeSec, name) { const b = body(score, date, timeSec, name); return b + 'x' + sign(b); }
-  const RE = /^S(\d{7})xD(\d{4})(\d{2})(\d{2})xT(\d{2})(\d{2})(\d{2})(\d{2})xN([0A-Z]{16})x([0-9A-HJKMNP-TV-Z]{18})$/;
+  function make(score, date, timeSec, name, game, vcode) { const b = body(score, date, timeSec, name, game, vcode); return b + 'x' + sign(b); }
+  const RE = /^S(\d{7})xD(\d{4})(\d{2})(\d{2})xT(\d{2})(\d{2})(\d{2})(\d{2})xN([0A-Z]{16})xV([A-Z0-9]{3})(\d{4})x([0-9A-HJKMNP-TV-Z]{18})$/;
+  const LEN = 74, SEP = [8, 18, 28, 46, 55];
   function parse(code) {
     code = String(code || '').trim().replace(/^.*#/, '');
     try { code = decodeURIComponent(code); } catch (e) { }
     code = code.replace(/\s+/g, '').toUpperCase();
-    if (code.length === 65) code = code.split('').map(function (c, i) { return (i === 8 || i === 18 || i === 28 || i === 46) && c === 'X' ? 'x' : c; }).join('');
+    if (code.length === LEN) code = code.split('').map(function (c, i) { return SEP.indexOf(i) >= 0 && c === 'X' ? 'x' : c; }).join('');
     const m = RE.exec(code);
     if (!m) return { ok: false, format: false, code: code };
     const b = code.slice(0, code.lastIndexOf('x'));
-    const ok = sign(b) === m[10];
+    const ok = sign(b) === m[12];
     const name = m[9].replace(/^0+/, '');
     return {
       ok: ok, format: true, code: code,
       score: parseInt(m[1], 10), year: +m[2], month: +m[3], day: +m[4],
       time: +m[5] * 3600 + +m[6] * 60 + +m[7] + +m[8] / 100, timeText: (+m[5] ? +m[5] + '時間' : '') + +m[6] + '分' + m[7] + '秒' + m[8],
-      name: name
+      name: name, game: m[10], gameName: GAMES[m[10]] || null, versionCode: +m[11], versionText: vcText(m[11])
     };
   }
   function url(code) { return PAGE + '#' + code; }
 
-  R13.verify = { VERSION: VERSION, PAGE: PAGE, make: make, parse: parse, url: url, body: body, _sha256: sha256, _hmac: hmac };
+  R13.verify = { VERSION: VERSION, GAME: GAME, VERSION_CODE: VERSION_CODE, GAMES: GAMES, PAGE: PAGE, make: make, parse: parse, url: url, body: body, _sha256: sha256, _hmac: hmac };
   if (typeof module === 'object' && module.exports) module.exports = R13.verify;
 })(typeof window !== 'undefined' ? window : globalThis);

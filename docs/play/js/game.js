@@ -402,7 +402,7 @@
       seg('card', '名所カード', [['full', 'イラスト付き'], ['brief', '最初だけイラスト'], ['name', '名前だけ']]) +
       seg('season', '季節（次の旅）', RT.SEASONS.map(function (x) { return [x.id, x.icon + x.name]; })) +
       onoff('assist', '🔰 操舵アシスト') + onoff('speedWarn', '🔰 速度注意表示');
-    html += '<p class="hint about-line">山形ドライブ R13 ver 1.0.5（非公式・個人制作）　<a href="' + R13.music.PRIVACY + '" data-ext>プライバシーポリシー</a></p>';
+    html += '<p class="hint about-line">山形ドライブ R13 ver 1.0.6（非公式・個人制作）　<a href="' + R13.music.PRIVACY + '" data-ext>プライバシーポリシー</a></p>';
     if (!fromPause) html += '<div class="danger-zone"><div><b>全履歴消去</b><div class="hint">全ドライバー、全コース記録、途中の旅、図鑑、解放ポイント、旧版の記録を消去します。描画や音などの設定は残ります。</div></div><button class="btn danger" id="set-erase">全履歴消去…</button></div>';
     else html += '<p class="hint" style="grid-column:1/-1">データの消去はタイトル画面の設定から行えます。</p>';
     if (host && host.hasSensor && !host.hasSensor()) html += '<p class="hint" style="grid-column:1/-1">この端末では傾きセンサーが見つからないため、タッチボタンで操舵します。</p>';
@@ -456,7 +456,7 @@
     if (host || !R13.web) return;
     const W = R13.web, self = this;
     document.documentElement.classList.add('web');
-    $('ver-line').innerHTML = '山形ドライブ R13 ver 1.0.5　ブラウザ版・非公式<br>広告／課金なし';
+    $('ver-line').innerHTML = '山形ドライブ R13 ver 1.0.6　ブラウザ版・非公式<br>広告／課金なし';
     W.tilt.onChange = function () { self._applySteerMode(); if (self.screen === 'settings') self._renderSettings(); };
     // iPhone の Safari で開いているとき：ホーム画面への追加を案内
     let hide = false; try { hide = localStorage.getItem('r13.a2hs') === '1'; } catch (e) { }
