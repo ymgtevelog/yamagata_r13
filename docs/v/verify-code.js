@@ -20,7 +20,7 @@
   const R13 = G.R13 = G.R13 || {};
   const VERSION = 'R13V2';
   // このソフトの記号とバージョン（versionCode）。バージョンを上げるときはここも直す（build.sh の VER と同じ）
-  const GAME = 'YD3', VERSION_CODE = 106;
+  const GAME = 'YD3', VERSION_CODE = 107;
   const GAMES = { YD3: '山形ドライブ R13' };
   const PAGE = 'https://ymgtevelog.github.io/yamagata_r13/v/';
 

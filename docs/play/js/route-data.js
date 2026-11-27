@@ -104,17 +104,18 @@
   });
 
   // 道の駅をモチーフとした施設（7）と給油所（3）
+  //   1.0.7：道の駅の名前は、走行中の表示（🎁 道の駅 米沢牛）にそろえて「道の駅 ＋ 特産品」に統一（図鑑・停車画面・クイズ・看板も同じ）
   const STATIONS = [
-    { id: 'eki-yonezawa', type: 'eki', s: 2400,  name: '道の駅 米沢',     short: '米沢',     item: 'beef',   region: 'yonezawa' },
-    { id: 'eki-takahata', type: 'eki', s: 5800,  name: '道の駅 たかはた', short: 'たかはた', item: 'jam',    region: 'takahata' },
+    { id: 'eki-yonezawa', type: 'eki', s: 2400,  name: '道の駅 米沢牛',     short: '米沢牛',     item: 'beef',   region: 'yonezawa' },
+    { id: 'eki-takahata', type: 'eki', s: 5800,  name: '道の駅 ぶどうジャム', short: 'ぶどうジャム', item: 'jam',    region: 'takahata' },
     { id: 'fuel-nanyo',   type: 'fuel', s: 11800, name: '南陽フューエル', short: '南陽',     region: 'nanyo' },
-    { id: 'eki-zao',      type: 'eki', s: 18600, name: '道の駅 やまがた蔵王', short: 'やまがた蔵王', item: 'imoni', region: 'yamagata' },
-    { id: 'eki-tendo',    type: 'eki', s: 25100, name: '道の駅 天童温泉', short: '天童温泉', item: 'koma',   region: 'tendo' },
+    { id: 'eki-zao',      type: 'eki', s: 18600, name: '道の駅 芋煮', short: '芋煮', item: 'imoni', region: 'yamagata' },
+    { id: 'eki-tendo',    type: 'eki', s: 25100, name: '道の駅 将棋駒', short: '将棋駒', item: 'koma',   region: 'tendo' },
     { id: 'fuel-higashine', type: 'fuel', s: 28600, name: '東根フューエル', short: '東根',   region: 'higashine' },
-    { id: 'eki-murayama', type: 'eki', s: 33300, name: '道の駅 むらやま', short: 'むらやま', item: 'soba',   region: 'murayama' },
-    { id: 'eki-obanazawa', type: 'eki', s: 37800, name: '道の駅 尾花沢', short: '尾花沢',     item: 'suika',  region: 'obanazawa' },
+    { id: 'eki-murayama', type: 'eki', s: 33300, name: '道の駅 そば', short: 'そば', item: 'soba',   region: 'murayama' },
+    { id: 'eki-obanazawa', type: 'eki', s: 37800, name: '道の駅 すいか', short: 'すいか',     item: 'suika',  region: 'obanazawa' },
     { id: 'fuel-funagata', type: 'fuel', s: 43000, name: '舟形フューエル', short: '舟形',     region: 'funagata' },
-    { id: 'eki-shinjo',   type: 'eki', s: 47000, name: '道の駅 新庄エコロジーガーデン原蚕の杜', short: '新庄 原蚕の杜', item: 'kujira', region: 'shinjo' }
+    { id: 'eki-shinjo',   type: 'eki', s: 47000, name: '道の駅 くじらもち', short: 'くじらもち', item: 'kujira', region: 'shinjo' }
   ];
 
   const ITEMS = {
